@@ -12,8 +12,8 @@ def health_check() -> dict[str, str]:
 
 
 @app.get("/items")
-def list_items(min_price: float = Query(0.0)) -> list[Item]:
-    return get_items(min_price=min_price)
+def list_items(min_price: float = Query(0.0), skip: int = Query(0, ge=0), limit: int = Query(100, ge=1)) -> list[Item]:
+    return get_items(min_price=min_price, skip=skip, limit=limit)
 
 
 @app.post("/items")
