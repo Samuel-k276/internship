@@ -31,3 +31,12 @@ def test_item_name_consistency() -> None:
     response = client.get("/items")
     names = [item["name"] for item in response.json()]
     assert "Item500000" in names
+
+def test_pagination() -> None:
+    response = client.get("/items?skip=0&limit=10")
+    assert len(response.json()) == 10
+    assert all(item["id"] <= 10 for item in response.json())
+
+def test_pagination_with_limit_above_1000() -> None:
+    response = client.get("/items?skip=0&limit=2000")
+    assert response.status_code == 422
