@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Tuple
 
 from app.database import items_db
 from app.models import Item, ItemCreate, ItemUpdate
@@ -15,12 +15,17 @@ def create_item(item: ItemCreate) -> Item:
     return Item(**new_item)
 
 
-def update_item_by_id(item_id: int, update: ItemUpdate) -> Item | None:
+def update_item_by_id(item_id: int, update: ItemUpdate) -> Tuple[Item, str]:
+    # Check for duplicate name
+    if any(i["name"] == update.name and i["id"] != item_id for i in items_db):
+        return None, "Duplicated name"
+
     for item in items_db:
         if item["id"] == item_id:
             if update.name:
                 item["name"] = update.name
             if update.price:
                 item["price"] = update.price
-            return Item(**item)
-    return None
+            return Item(**item), ""
+        
+    return None,  "Not Found"
