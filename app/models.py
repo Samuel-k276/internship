@@ -11,9 +11,9 @@ class Item(BaseModel):
 
 class ItemCreate(BaseModel):
     name: str = Field(..., min_length=3)
-    price: float
+    price: float = Field(..., gt=0)
 
 
 class ItemUpdate(BaseModel):
-    name: Optional[str] = None
-    price: Optional[float] = None
+    name: Optional[str] = Field(None, min_length=3)
+    price: Optional[float] = Field(None, gt=0)
