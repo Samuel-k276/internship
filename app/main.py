@@ -23,7 +23,9 @@ def add_item(item: ItemCreate) -> Item:
 
 @app.put("/items/{item_id}")
 def update_item(item_id: int, item: ItemUpdate) -> Item:
-    updated = update_item_by_id(item_id, item)
-    if not updated:
-        raise HTTPException(status_code=404, detail="Item not found or duplicate name")
+    updated, code = update_item_by_id(item_id, item)
+    if code == "Duplicated name":
+        raise HTTPException(status_code=422, detail="Item name already exists")
+    if code == "Not Found":
+        raise HTTPException(status_code=404, detail="Item not found")
     return updated
