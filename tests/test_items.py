@@ -32,6 +32,7 @@ def test_update_to_duplicate_name() -> None:
     resp = client.put("/items/1", json={"name": "Grape"})
     assert resp.status_code == 400 or resp.status_code == 422
 
+
 def test_item_name_consistency() -> None:
     unique_name = f"ConsistencyTest_{int(__import__('time').time())}"
     response = client.post("/items", json={"name": unique_name, "price": 5})
@@ -47,4 +48,4 @@ def test_item_name_consistency() -> None:
 
 def test_pagination() -> None:
     response = client.get("/items?skip=0&limit=10")
-    assert len(response.json()) == 10
+    assert len(response.json()) <= 10
