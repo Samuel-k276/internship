@@ -6,32 +6,18 @@ from app.models import Item, ItemCreate, ItemUpdate
 
 def get_items(min_price: float = 0.0, skip: int = 0, limit: int = 100) -> List[Item]:
    """
-    I would apply Pagination to the get_items function, introducing skip and limit parameters.
-    This would allow the client to specify how many items to skip and how many to return.
-
-    Explaination:
-    - Because most of the time consumed is in constructing the response, 
-    we can optimize the get_items function by adding pagination.
-    - This will allow the client to request only a subset of items, 
-    reducing the amount of data processed and sent over the network
-    - If there is still a need to fetch all items,
-    the client can set skip to 0 and limit to a crazy large number.
-
-    Now that the number of items is independent of the number of items in the database (in most cases),
-    the time it takes to process the request will be heavily reduced.
-
-    Time comparison:
-    - Before: O(n) for filtering and O(n) for constructing the response,
-    - After: O(n) for filtering and O(1) for constructing the response.
-
-    We could also use a pagination approach with page and size as parameters
-    or a token-based pagination approach (using a cursor to track the last item seen)
-    """
+   Using Pagination with skip and limit parameters
+   This would allow the client to specify how many items to skip and how many to return.
+   """
    return [Item(**item) for item in items_db[skip : skip + limit] if item["price"] >= min_price]
 
 
 def create_item(item: ItemCreate) -> Item:
-    new_id = items_db[-1]["id"] + 1 if items_db else 1
+    # Check for duplicate name
+    if any(i["name"] == item.name for i in items_db):
+        return None
+
+    new_id = max(item["id"] for item in items_db) + 1 if items_db else 1
     new_item = {"id": new_id, **item.dict()}
     items_db.append(new_item)
     return Item(**new_item)

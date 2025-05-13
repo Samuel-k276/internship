@@ -18,14 +18,17 @@ def list_items(min_price: float = Query(0.0), skip: int = Query(0, ge=0), limit:
 
 @app.post("/items")
 def add_item(item: ItemCreate) -> Item:
-    return create_item(item)
+    item = create_item(item)
+    if item is None:
+        raise HTTPException(status_code=422, detail="Item name already exists")
+    return item
 
 
 @app.put("/items/{item_id}")
 def update_item(item_id: int, item: ItemUpdate) -> Item:
-    updated, code = update_item_by_id(item_id, item)
-    if code == "Duplicated name":
+    updated, error = update_item_by_id(item_id, item)
+    if error == "Duplicated name":
         raise HTTPException(status_code=422, detail="Item name already exists")
-    if code == "Not Found":
+    if error == "Not Found":
         raise HTTPException(status_code=404, detail="Item not found")
     return updated
